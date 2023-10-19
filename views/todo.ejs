@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Todo List||</title>
+    <link href="styles.css" rel="stylesheet" type="text/css" />
+  </head>
+  <body>
+    <h1>My Todo List</h1>
+    <div class="todo-table">
+      <!-- <form >
+            <input id="inp01"  type="text" name="item" placeholder="Add new item..." required>
+            <button type="submit">Add Item</button>
+        </form> -->
+      <br />
+      <!-- <ul>
+           <% for(var i=0; i<todos.length; i++){%>
+            <li><%= todos[i].item %></li>
+          <%  } %>
+        </ul> -->
+
+      <form action="/todo" method="POST">
+        <input
+          id="inp01"
+          type="text"
+          name="item"
+          placeholder="Add new item..."
+          required
+        />
+        <button type="submit">Add Item</button>
+      </form>
+      <!-- Add a unique identifier to each item -->
+      <ul>
+        <% for (var i = 0; i < todos.length; i++) { %>
+        <li>
+          <%= todos[i].item %>
+          <button class="delete-button" data-id="<%= todos[i].number %>">
+            Delete
+          </button>
+        </li>
+        <% } %>
+      </ul>
+    </div>
+    <script>
+      const form = document.querySelector("form");
+      const inp01 = document.getElementById("inp01");
+      const list = document.querySelector("ul");
+
+      form.addEventListener("submit", async (e) => {
+        // const input= form.item.value;  // Incorrect x
+        // const input = form.elements[0].value // Correct
+        const input = form.item.value;
+        // const input = inp01.value // Correct
+        e.preventDefault();
+
+        try {
+          const res = await fetch("/todo", {
+            method: "POST",
+            body: JSON.stringify({ item: input }),
+            headers: { "Content-Type": "application/json" },
+          });
+
+          const data = await res.json();
+          console.log(data);
+          // list.innerHTML=data; you have to loop data and then insert the list one after the other
+          location.reload(); //  or you could just reload to refetch them
+          // location.assign('/todo') //used to bring it to a particular url upon loading
+        } catch (error) {
+          console.log(error);
+        }
+      });
+
+      // Delete the tasks:
+
+      list.addEventListener("click", async (e) => {
+        if (e.target.classList.contains("delete-button")) {
+          const id = e.target.getAttribute("data-id");
+          try {
+            const del = await fetch(`/todo/${id}`, {
+              method: "DELETE",
+            });
+            // Update the DOM or refresh as needed
+            console.log("Sucesful!");
+            location.assign("/todo");
+            del.json();
+          } catch (error) {
+            alert(error);
+          }
+        }
+      });
+    </script>
+  </body>
+</html>
